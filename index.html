@@ -179,7 +179,31 @@
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 20px; }
 
-    </style>
+    
+.figma-page,.screen{
+    position:relative !important;
+    display:flex !important;
+    width:393px;
+    min-height:852px;
+    margin:40px;
+    border-radius:32px;
+    overflow:hidden;
+}
+.mobile-frame{
+    width:auto !important;
+    height:auto !important;
+    border:none !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    display:flex;
+    flex-wrap:wrap;
+    gap:40px;
+}
+.bottom-nav{
+    display:flex !important;
+}
+
+</style>
 </head>
 <body>
 
@@ -188,7 +212,7 @@
         <!-- ==========================================
              SCREEN 1: SPLASH SCREEN
              ========================================== -->
-        <div id="splash-screen" class="screen active">
+        <div id="splash-screen" class="screen figma-page">
             <i class="fa-solid fa-graduation-cap"></i>
             <h1>KelasHub</h1>
             <p style="font-family: 'Poppins';">Satu aplikasi untuk kelas kita</p>
@@ -197,7 +221,7 @@
         <!-- ==========================================
              SCREEN 2: LOGIN
              ========================================== -->
-        <div id="login-screen" class="screen">
+        <div id="login-screen" class="screen figma-page">
             <div class="login-header">
                 <i class="fa-solid fa-graduation-cap"></i>
                 <h2>Selamat Datang!</h2>
@@ -217,7 +241,7 @@
         <!-- ==========================================
              SCREEN 3: BERANDA (HOME)
              ========================================== -->
-        <div id="home-screen" class="screen">
+        <div id="home-screen" class="screen figma-page">
             <!-- Header Profil -->
             <div class="header-app">
                 <div style="display: flex; align-items: center; gap: 15px;">
@@ -285,7 +309,7 @@
         <!-- ==========================================
              SUB-SCREEN: WORO-WORO (PENGUMUMAN)
              ========================================== -->
-        <div id="woro-screen" class="screen">
+        <div id="woro-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Woro-woro</h2>
@@ -319,7 +343,7 @@
         <!-- ==========================================
              SUB-SCREEN: GALERI
              ========================================== -->
-        <div id="gallery-screen" class="screen">
+        <div id="gallery-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Galeri Kelas</h2>
@@ -338,7 +362,7 @@
         <!-- ==========================================
              SUB-SCREEN: KEUANGAN (KAS KELAS)
              ========================================== -->
-        <div id="finance-screen" class="screen">
+        <div id="finance-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Uang Kas Kelas</h2>
@@ -375,7 +399,7 @@
         <!-- ==========================================
              SUB-SCREEN: JADWAL PERKULIAHAN
              ========================================== -->
-        <div id="schedule-screen" class="screen">
+        <div id="schedule-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Jadwal Kuliah</h2>
@@ -400,7 +424,7 @@
         <!-- ==========================================
              SUB-SCREEN: ACARA KELAS
              ========================================== -->
-        <div id="event-screen" class="screen">
+        <div id="event-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Acara Kelas</h2>
@@ -420,7 +444,7 @@
         <!-- ==========================================
              SUB-SCREEN: KEHADIRAN
              ========================================== -->
-        <div id="attendance-screen" class="screen">
+        <div id="attendance-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Kehadiran Saya</h2>
@@ -441,7 +465,7 @@
         <!-- ==========================================
              SUB-SCREEN: KAWANKU (MEMBER)
              ========================================== -->
-        <div id="member-screen" class="screen">
+        <div id="member-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Kawanku (32 Member)</h2>
@@ -467,7 +491,7 @@
         <!-- ==========================================
              SUB-SCREEN: CIT-CHATKU
              ========================================== -->
-        <div id="chat-screen" class="screen">
+        <div id="chat-screen" class="screen figma-page">
             <div class="sub-header">
                 <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
                 <h2>Cit-Chatku</h2>
@@ -489,7 +513,7 @@
         <!-- ==========================================
              SCREEN 4: PENGATURAN (SETTINGS)
              ========================================== -->
-        <div id="settings-screen" class="screen">
+        <div id="settings-screen" class="screen figma-page">
             <div class="sub-header">
                 <h2>Pengaturan</h2>
             </div>
@@ -547,40 +571,5 @@
     <!-- ==========================================
          JAVASCRIPT LOGIC
          ========================================== -->
-    <script>
-        // Logika Splash Screen pindah otomatis ke Login setelah 2 detik
-        setTimeout(() => {
-            goToScreen('login-screen', null);
-        }, 2000);
-
-        // Fungsi Utama untuk Berpindah Halaman (Screen)
-        function goToScreen(screenId, navId) {
-            // 1. Sembunyikan semua screen yang sedang aktif
-            const screens = document.querySelectorAll('.screen');
-            screens.forEach(screen => {
-                screen.classList.remove('active');
-            });
-            
-            // 2. Tampilkan screen yang dituju
-            document.getElementById(screenId).classList.add('active');
-
-            // 3. Atur kemunculan Menu Bawah (Sembunyikan saat Splash & Login)
-            const bottomNav = document.getElementById('bottom-navigation');
-            if (screenId === 'splash-screen' || screenId === 'login-screen') {
-                bottomNav.style.display = 'none';
-            } else {
-                bottomNav.style.display = 'flex';
-            }
-
-            // 4. Ubah status warna ikon menu bawah jika tombolnya diklik
-            if (navId) {
-                document.querySelectorAll('.nav-item').forEach(nav => {
-                    nav.classList.remove('active');
-                });
-                const targetNav = document.getElementById(navId);
-                if(targetNav) targetNav.classList.add('active');
-            }
-        }
-    </script>
-</body>
+    </body>
 </html>

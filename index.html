@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aplikasi KelasHub</title>
+    
+    <!-- Import Font: Poppins untuk Judul, Inter untuk Teks Paragraf -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Import FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           1. VARIABEL WARNA & TEMA GLOBAL
+           ========================================= */
+        :root {
+            --primary: #1D3557;      /* Biru Gelap / Navy */
+            --primary-light: #457B9D;/* Biru Terang */
+            --secondary: #F4A261;    /* Oranye / Kuning */
+            --bg: #F8F9FA;           /* Abu-abu Latar Belakang */
+            --surface: #FFFFFF;      /* Putih untuk Kartu/Box */
+            --text-main: #2B2D42;    /* Teks Utama (Hitam) */
+            --text-muted: #8D99AE;   /* Teks Sekunder (Abu-abu) */
+            --success: #10B981;      /* Hijau Sukses */
+            --danger: #E63946;       /* Merah Bahaya/Keluar */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; /* Hilangkan efek biru saat klik di HP */
+        }
+
+        body {
+            background-color: #e0e5ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* Tipografi Global */
+        h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; }
+
+        /* =========================================
+           2. MOCKUP FRAME (TAMPILAN HP DI DESKTOP)
+           ========================================= */
+        .mobile-frame {
+            width: 393px;
+            height: 852px; /* Ukuran setara iPhone 14 Pro */
+            background: var(--bg);
+            border: 12px solid #111;
+            border-radius: 45px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        /* Media Query: Menghilangkan bingkai jika dibuka di HP asli */
+        @media (max-width: 500px) {
+            body { align-items: flex-start; background-color: var(--bg); }
+            .mobile-frame { width: 100%; height: 100vh; border: none; border-radius: 0; box-shadow: none; }
+        }
+
+        /* =========================================
+           3. SISTEM NAVIGASI LAYAR (SCREENS)
+           ========================================= */
+        .screen {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg);
+            display: none; /* Disembunyikan secara default */
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 90px; /* Jarak untuk navigasi bawah */
+        }
+        .screen.active {
+            display: flex; /* Ditampilkan jika memiliki class 'active' */
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Universal untuk Sub-halaman */
+        .sub-header {
+            position: sticky; top: 0;
+            background-color: var(--surface);
+            padding: 40px 24px 20px;
+            display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+        .back-btn { font-size: 20px; cursor: pointer; color: var(--text-main); }
+        .sub-header h2 { font-size: 18px; flex: 1; }
+
+        /* =========================================
+           4. DESAIN TIAP HALAMAN (SCREENS)
+           ========================================= */
+        
+        /* -- SPLASH SCREEN -- */
+        #splash-screen { background-color: var(--primary); justify-content: center; align-items: center; color: white; z-index: 100; }
+        #splash-screen i { font-size: 64px; margin-bottom: 20px; color: var(--secondary); }
+        #splash-screen h1 { color: white; font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+        
+        /* -- LOGIN SCREEN -- */
+        #login-screen { background-color: var(--surface); padding: 40px 30px; justify-content: center; }
+        .login-header { text-align: center; margin-bottom: 40px; }
+        .login-header i { font-size: 48px; color: var(--primary); margin-bottom: 15px; }
+        .form-control { width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 14px; font-family: 'Inter', sans-serif; background-color: var(--bg); margin-bottom: 15px; }
+        .btn-primary { width: 100%; padding: 16px; background-color: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; font-family: 'Poppins'; cursor: pointer; }
+
+        /* -- BERANDA (HOME) -- */
+        .header-app { background-color: var(--primary); color: white; padding: 50px 24px 30px 24px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .profile-img-small { width: 50px; height: 50px; background-color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--primary); font-size: 24px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 10px 24px; }
+        .menu-item { background-color: var(--surface); border-radius: 20px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .menu-icon { width: 48px; height: 48px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        
+        /* -- WORO-WORO (FEED PENGUMUMAN) -- */
+        .feed-container { padding: 20px 24px; display: flex; flex-direction: column; gap: 15px; }
+        .post-card { background: var(--surface); padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .post-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; }
+        .post-title h4 { font-size: 14px; } .post-title span { font-size: 11px; color: var(--text-muted); }
+        .post-content { font-size: 13px; line-height: 1.5; color: var(--text-main); }
+        .fab-btn { position: fixed; bottom: 100px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(29, 53, 87, 0.4); cursor: pointer; z-index: 20; }
+
+        /* -- GALERI -- */
+        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 5px; }
+        .gallery-item { aspect-ratio: 1; background: #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 24px; overflow: hidden; }
+
+        /* -- KEUANGAN -- */
+        .finance-card { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; margin: 20px 24px; padding: 25px; border-radius: 20px; text-align: center; }
+        .transaction-list { padding: 0 24px; }
+        .trx-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #E2E8F0; }
+        .trx-left { display: flex; align-items: center; gap: 15px; }
+        .trx-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .trx-in { background: #D1FAE5; color: var(--success); } .trx-out { background: #FEE2E2; color: var(--danger); }
+        .amount-in { color: var(--success); font-weight: 600; } .amount-out { color: var(--danger); font-weight: 600; }
+
+        /* -- JADWAL & ACARA -- */
+        .schedule-list { padding: 20px 24px; display: flex; flex-direction: column; gap: 15px; }
+        .schedule-card { background: var(--surface); padding: 20px; border-radius: 16px; border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .schedule-time { font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 5px; }
+
+        /* -- KAWANKU / DAFTAR MEMBER -- */
+        .member-list { padding: 10px 24px; }
+        .member-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 12px; margin-bottom: 10px; }
+        
+        /* -- PENGATURAN -- */
+        .setting-list { background-color: var(--surface); padding: 10px 24px; margin-top: 20px; }
+        .setting-item { display: flex; align-items: center; gap: 15px; padding: 20px 0; border-bottom: 1px solid #F1F5F9; cursor: pointer; }
+
+        /* =========================================
+           5. BOTTOM NAVIGATION BAR
+           ========================================= */
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background-color: var(--surface);
+            display: flex; justify-content: space-around;
+            padding: 15px 10px 25px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            border-top-left-radius: 30px; border-top-right-radius: 30px;
+            z-index: 50;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-muted); font-size: 11px; cursor: pointer; width: 60px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 20px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+
+        <!-- ==========================================
+             SCREEN 1: SPLASH SCREEN
+             ========================================== -->
+        <div id="splash-screen" class="screen active">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <h1>KelasHub</h1>
+            <p style="font-family: 'Poppins';">Satu aplikasi untuk kelas kita</p>
+        </div>
+
+        <!-- ==========================================
+             SCREEN 2: LOGIN
+             ========================================== -->
+        <div id="login-screen" class="screen">
+            <div class="login-header">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <h2>Selamat Datang!</h2>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Masuk ke komunitas kelasmu</p>
+            </div>
+            <input type="text" class="form-control" placeholder="Username atau NIM">
+            <input type="password" class="form-control" placeholder="Password">
+            <div style="text-align: right; color: var(--primary-light); font-size: 13px; margin-bottom: 30px; cursor:pointer;">Lupa Password?</div>
+            
+            <button class="btn-primary" onclick="goToScreen('home-screen', 'nav-home')">Masuk</button>
+            
+            <div style="text-align: center; margin-top: 40px; font-size: 14px; color: var(--text-muted);">
+                Belum punya akun? <span style="color: var(--primary); font-weight: 600;">Buat sekarang</span>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SCREEN 3: BERANDA (HOME)
+             ========================================== -->
+        <div id="home-screen" class="screen">
+            <!-- Header Profil -->
+            <div class="header-app">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="profile-img-small"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <p style="font-size: 12px; opacity: 0.8; margin-bottom: 2px;">Halo, Selamat pagi 👋</p>
+                        <h2 style="font-size: 18px;">Bintang Rahmanda</h2>
+                    </div>
+                </div>
+                <i class="fa-regular fa-bell" style="font-size: 24px;"></i>
+            </div>
+
+            <h3 style="padding: 24px 24px 10px; font-size: 16px;">Info Kelas</h3>
+            
+            <!-- Grid Menu 3x2 -->
+            <div class="menu-grid">
+                <div class="menu-item" onclick="goToScreen('woro-screen')">
+                    <div class="menu-icon" style="color: #F59E0B; background: #FEF3C7;"><i class="fa-solid fa-bullhorn"></i></div>
+                    <span style="font-size: 12px; font-weight: 500;">Woro-woro</span>
+                </div>
+                <div class="menu-item" onclick="goToScreen('gallery-screen')">
+                    <div class="menu-icon" style="color: #10B981; background: #D1FAE5;"><i class="fa-regular fa-images"></i></div>
+                    <span style="font-size: 12px; font-weight: 500;">Galeri</span>
+                </div>
+                <div class="menu-item" onclick="goToScreen('finance-screen')">
+                    <div class="menu-icon" style="color: #3B82F6; background: #DBEAFE;"><i class="fa-solid fa-wallet"></i></div>
+                    <span style="font-size: 12px; font-weight: 500;">Keuangan</span>
+                </div>
+                <div class="menu-item" onclick="goToScreen('schedule-screen')">
+                    <div class="menu-icon" style="color: #8B5CF6; background: #EDE9FE;"><i class="fa-regular fa-calendar-alt"></i></div>
+                    <span style="font-size: 12px; font-weight: 500;">Jadwal</span>
+                </div>
+                <div class="menu-item" onclick="goToScreen('event-screen')">
+                    <div class="menu-icon" style="color: #EC4899; background: #FCE7F3;"><i class="fa-solid fa-champagne-glasses"></i></div>
+                    <span style="font-size: 12px; font-weight: 500;">Acara</span>
+                </div>
+                <div class="menu-item" onclick="goToScreen('attendance-screen')">
+                    <div class="menu-icon" style="color: #14B8A6; background: #CCFBF1;"><i class="fa-solid fa-clipboard-user"></i></div>
+                    <span style="font-size: 12px; font-weight: 500;">Kehadiran</span>
+                </div>
+            </div>
+
+            <h3 style="padding: 24px 24px 10px; font-size: 16px;">Member Kelas</h3>
+            
+            <div style="padding: 0 24px; display: flex; flex-direction: column; gap: 15px;">
+                <div class="menu-item" style="flex-direction: row;" onclick="goToScreen('member-screen')">
+                    <div class="menu-icon" style="background: #FFF7ED; color: #F4A261;"><i class="fa-solid fa-users"></i></div>
+                    <div style="flex: 1; text-align: left;">
+                        <h4 style="font-size: 14px;">Kawanku</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Lihat profil teman sekelas</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color: var(--text-muted);"></i>
+                </div>
+                <div class="menu-item" style="flex-direction: row;" onclick="goToScreen('chat-screen')">
+                    <div class="menu-icon" style="background: #E0E7FF; color: #4F46E5;"><i class="fa-solid fa-messages"></i></div>
+                    <div style="flex: 1; text-align: left;">
+                        <h4 style="font-size: 14px;">Cit-Chatku</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Mulai obrolan personal</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color: var(--text-muted);"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: WORO-WORO (PENGUMUMAN)
+             ========================================== -->
+        <div id="woro-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Woro-woro</h2>
+            </div>
+            <div class="feed-container">
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                        <div class="post-title">
+                            <h4>Ketua Kelas (Dendi)</h4>
+                            <span>Hari ini, 09:00 WIB</span>
+                        </div>
+                    </div>
+                    <p class="post-content">Teman-teman, jangan lupa besok ada kuliah pengganti Pak Budi jam 08.00 di Ruang B302. Tugas presentasi harap disiapkan ya! 🙏</p>
+                </div>
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-avatar" style="background: #E11D48;"><i class="fa-solid fa-user"></i></div>
+                        <div class="post-title">
+                            <h4>Siti Aminah</h4>
+                            <span>Kemarin, 14:30 WIB</span>
+                        </div>
+                    </div>
+                    <p class="post-content">Guys, yang mau pesan jaket kelas terakhir pembayaran hari Jumat ya. Jangan sampai kelewat!</p>
+                </div>
+            </div>
+            <!-- Tombol Tambah Pengumuman -->
+            <div class="fab-btn"><i class="fa-solid fa-plus"></i></div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: GALERI
+             ========================================== -->
+        <div id="gallery-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Galeri Kelas</h2>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item"><i class="fa-solid fa-image"></i></div>
+                <div class="gallery-item"><i class="fa-solid fa-image"></i></div>
+                <div class="gallery-item"><i class="fa-solid fa-image"></i></div>
+                <div class="gallery-item"><i class="fa-solid fa-camera"></i></div>
+                <div class="gallery-item"><i class="fa-solid fa-image"></i></div>
+                <div class="gallery-item"><i class="fa-solid fa-video"></i></div>
+            </div>
+            <div class="fab-btn"><i class="fa-solid fa-upload"></i></div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: KEUANGAN (KAS KELAS)
+             ========================================== -->
+        <div id="finance-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Uang Kas Kelas</h2>
+            </div>
+            <div class="finance-card">
+                <p style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">Saldo Kas Saat Ini</p>
+                <h2 style="font-size: 32px;">Rp 1.450.000</h2>
+            </div>
+            <h3 style="padding: 10px 24px; font-size: 16px;">Riwayat Keuangan</h3>
+            <div class="transaction-list">
+                <div class="trx-item">
+                    <div class="trx-left">
+                        <div class="trx-icon trx-in"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div>
+                            <h4 style="font-size: 14px;">Iuran Kas Bulanan</h4>
+                            <p style="font-size: 11px; color: var(--text-muted);">12 Nov 2023</p>
+                        </div>
+                    </div>
+                    <div class="amount-in">+ Rp 50.000</div>
+                </div>
+                <div class="trx-item">
+                    <div class="trx-left">
+                        <div class="trx-icon trx-out"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div>
+                            <h4 style="font-size: 14px;">Beli Kertas HVS</h4>
+                            <p style="font-size: 11px; color: var(--text-muted);">10 Nov 2023</p>
+                        </div>
+                    </div>
+                    <div class="amount-out">- Rp 45.000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: JADWAL PERKULIAHAN
+             ========================================== -->
+        <div id="schedule-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Jadwal Kuliah</h2>
+            </div>
+            <div class="schedule-list">
+                <h4 style="color: var(--text-muted); font-size: 14px;">HARI INI (Senin)</h4>
+                <div class="schedule-card">
+                    <div class="schedule-time">08:00 - 10:30 WIB</div>
+                    <h3 style="font-size: 16px; margin-bottom: 5px;">Pemrograman Web Lanjut</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-user-tie"></i> Bpk. Dr. Ilham S.Kom</p>
+                    <p style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Ruang Lab Komputer A</p>
+                </div>
+                <div class="schedule-card" style="border-left-color: var(--secondary);">
+                    <div class="schedule-time" style="color: var(--secondary);">13:00 - 15:30 WIB</div>
+                    <h3 style="font-size: 16px; margin-bottom: 5px;">Rekayasa Perangkat Lunak</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-user-tie"></i> Ibu Rina M.T</p>
+                    <p style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Ruang Teori B2</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: ACARA KELAS
+             ========================================== -->
+        <div id="event-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Acara Kelas</h2>
+            </div>
+            <div class="schedule-list">
+                <div class="schedule-card" style="border-left-color: #EC4899;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div class="schedule-time" style="color: #EC4899;">15 Desember 2023</div>
+                        <span style="font-size: 10px; background:#FCE7F3; color:#EC4899; padding: 3px 8px; border-radius: 10px; font-weight: bold;">H-12</span>
+                    </div>
+                    <h3 style="font-size: 16px; margin-bottom: 5px;">Makrab Kelas Akhir Tahun</h3>
+                    <p style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Villa Puncak Bogor</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: KEHADIRAN
+             ========================================== -->
+        <div id="attendance-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Kehadiran Saya</h2>
+            </div>
+            <div style="text-align: center; padding: 30px;">
+                <div style="width: 120px; height: 120px; border-radius: 50%; border: 8px solid var(--success); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; font-family: 'Poppins'; color: var(--success);">
+                    95%
+                </div>
+                <p style="font-size: 14px;">Total Kehadiran Semester Ini</p>
+            </div>
+            <div style="padding: 0 24px;">
+                <button class="btn-primary" style="background: var(--surface); color: var(--primary); border: 2px dashed var(--primary); margin-bottom: 20px;">
+                    <i class="fa-solid fa-camera"></i> Upload Surat Izin / Sakit
+                </button>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: KAWANKU (MEMBER)
+             ========================================== -->
+        <div id="member-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Kawanku (32 Member)</h2>
+            </div>
+            <div class="member-list">
+                <div class="member-item">
+                    <div class="post-avatar"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <h4 style="font-size: 15px;">Andi Saputra</h4>
+                        <p style="font-size: 12px; color: var(--text-muted);">NIM: 102938102</p>
+                    </div>
+                </div>
+                <div class="member-item">
+                    <div class="post-avatar" style="background: #E1306C;"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <h4 style="font-size: 15px;">Bella Nabila</h4>
+                        <p style="font-size: 12px; color: var(--text-muted);">NIM: 102938103</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SUB-SCREEN: CIT-CHATKU
+             ========================================== -->
+        <div id="chat-screen" class="screen">
+            <div class="sub-header">
+                <i class="fa-solid fa-arrow-left back-btn" onclick="goToScreen('home-screen', 'nav-home')"></i>
+                <h2>Cit-Chatku</h2>
+            </div>
+            <div class="member-list">
+                <div class="member-item">
+                    <div class="post-avatar" style="background: #10B981;"><i class="fa-solid fa-user"></i></div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <h4 style="font-size: 15px;">Dendi (Ketua Kelas)</h4>
+                            <span style="font-size: 10px; color: var(--text-muted);">10:05</span>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Oke sip, besok kubawa berkasnya.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SCREEN 4: PENGATURAN (SETTINGS)
+             ========================================== -->
+        <div id="settings-screen" class="screen">
+            <div class="sub-header">
+                <h2>Pengaturan</h2>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <div style="width: 100px; height: 100px; background: var(--bg); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--primary);">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <h3>Bintang Rahmanda</h3>
+                <span style="color: var(--primary); font-size: 13px; font-weight: 600; cursor: pointer;">GANTI FOTO PROFIL</span>
+            </div>
+
+            <div class="setting-list">
+                <div class="setting-item">
+                    <div style="width: 40px; height: 40px; background: var(--bg); border-radius: 12px; display: flex; justify-content: center; align-items: center; color: var(--primary);"><i class="fa-solid fa-lock"></i></div>
+                    <div style="flex: 1; font-weight: 500; font-size: 15px;">Akun (Username & Password)</div>
+                    <i class="fa-solid fa-chevron-right" style="color: #CBD5E1;"></i>
+                </div>
+                <div class="setting-item">
+                    <div style="width: 40px; height: 40px; background: var(--bg); border-radius: 12px; display: flex; justify-content: center; align-items: center; color: var(--primary);"><i class="fa-solid fa-address-card"></i></div>
+                    <div style="flex: 1; font-weight: 500; font-size: 15px;">Biodata Lengkap</div>
+                    <i class="fa-solid fa-chevron-right" style="color: #CBD5E1;"></i>
+                </div>
+                <div class="setting-item">
+                    <div style="width: 40px; height: 40px; background: var(--bg); border-radius: 12px; display: flex; justify-content: center; align-items: center; color: var(--primary);"><i class="fa-regular fa-circle-question"></i></div>
+                    <div style="flex: 1; font-weight: 500; font-size: 15px;">Bantuan?</div>
+                    <i class="fa-solid fa-chevron-right" style="color: #CBD5E1;"></i>
+                </div>
+            </div>
+
+            <div style="padding: 30px 24px;">
+                <button class="btn-primary" style="background: #FFF0F1; color: var(--danger);" onclick="goToScreen('login-screen', null)">Keluar Aplikasi (Logout)</button>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             BOTTOM NAVIGATION (MENU BAWAH)
+             ========================================== -->
+        <div class="bottom-nav" id="bottom-navigation" style="display: none;">
+            <div class="nav-item active" id="nav-home" onclick="goToScreen('home-screen', 'nav-home')">
+                <i class="fa-solid fa-house"></i>
+                <span>Beranda</span>
+            </div>
+            <div class="nav-item" id="nav-chat" onclick="goToScreen('chat-screen', 'nav-chat')">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>Cit-Chat</span>
+            </div>
+            <div class="nav-item" id="nav-settings" onclick="goToScreen('settings-screen', 'nav-settings')">
+                <i class="fa-solid fa-gear"></i>
+                <span>Pengaturan</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC
+         ========================================== -->
+    <script>
+        // Logika Splash Screen pindah otomatis ke Login setelah 2 detik
+        setTimeout(() => {
+            goToScreen('login-screen', null);
+        }, 2000);
+
+        // Fungsi Utama untuk Berpindah Halaman (Screen)
+        function goToScreen(screenId, navId) {
+            // 1. Sembunyikan semua screen yang sedang aktif
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // 2. Tampilkan screen yang dituju
+            document.getElementById(screenId).classList.add('active');
+
+            // 3. Atur kemunculan Menu Bawah (Sembunyikan saat Splash & Login)
+            const bottomNav = document.getElementById('bottom-navigation');
+            if (screenId === 'splash-screen' || screenId === 'login-screen') {
+                bottomNav.style.display = 'none';
+            } else {
+                bottomNav.style.display = 'flex';
+            }
+
+            // 4. Ubah status warna ikon menu bawah jika tombolnya diklik
+            if (navId) {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                const targetNav = document.getElementById(navId);
+                if(targetNav) targetNav.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
